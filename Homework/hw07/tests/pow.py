@@ -3,14 +3,9 @@ test = {
   'points': 1,
   'suites': [
     {
-      'scored': True,
-      'setup': """
-      scm> (load-all ".")
-      """,
-      'type': 'scheme',
       'cases': [
         {
-          'code': """
+          'code': r"""
           scm> (pow 2 5)
           32
           """,
@@ -18,7 +13,7 @@ test = {
           'locked': False
         },
         {
-          'code': """
+          'code': r"""
           scm> (pow 10 3)
           1000
           """,
@@ -26,7 +21,7 @@ test = {
           'locked': False
         },
         {
-          'code': """
+          'code': r"""
           scm> (pow 3 3)
           27
           """,
@@ -34,14 +29,20 @@ test = {
           'locked': False
         },
         {
-          'code': """
-          scm> (pow 1 100000000000000) ; make sure this doesn't run forever!
+          'code': r"""
+          scm> (pow 1 100000000000000) ; make sure you are using the logarithmic time algorithm!
           1
           """,
           'hidden': False,
           'locked': False
-        },
+        }
       ],
-    },
+      'scored': True,
+      'setup': r"""
+      scm> (load-all ".")
+      """,
+      'teardown': '',
+      'type': 'scheme'
+    }
   ]
 }

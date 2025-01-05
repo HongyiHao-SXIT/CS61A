@@ -1,163 +1,266 @@
-def hailstone(n):
-    """
-    Yields the elements of the hailstone sequence starting at n.
-    At the end of the sequence, yield 1 infinitely.
+def make_bank(balance):
+    """Returns a bank function with a starting balance. Supports
+    withdrawals and deposits.
 
-    >>> hail_gen = hailstone(10)
-    >>> [next(hail_gen) for _ in range(10)]
-    [10, 5, 16, 8, 4, 2, 1, 1, 1, 1]
-    >>> next(hail_gen)
-    1
+    >>> bank = make_bank(100)
+    >>> bank('withdraw', 40)    # 100 - 40
+    60
+    >>> bank('hello', 500)      # Invalid message passed in
+    'Invalid message'
+    >>> bank('deposit', 20)     # 60 + 20
+    80
+    >>> bank('withdraw', 90)    # 80 - 90; not enough money
+    'Insufficient funds'
+    >>> bank('deposit', 100)    # 80 + 100
+    180
+    >>> bank('goodbye', 0)      # Invalid message passed in
+    'Invalid message'
+    >>> bank('withdraw', 60)    # 180 - 60
+    120
     """
-    "*** YOUR CODE HERE ***"
-
-
-def merge(a, b):
-    """
-    Return a generator that has all of the elements of generators a and b,
-    in increasing order, without duplicates.
-
-    >>> def sequence(start, step):
-    ...     while True:
-    ...         yield start
-    ...         start += step
-    >>> a = sequence(2, 3) # 2, 5, 8, 11, 14, ...
-    >>> b = sequence(3, 2) # 3, 5, 7, 9, 11, 13, 15, ...
-    >>> result = merge(a, b) # 2, 3, 5, 7, 8, 9, 11, 13, 14, 15
-    >>> [next(result) for _ in range(10)]
-    [2, 3, 5, 7, 8, 9, 11, 13, 14, 15]
-    """
-    a_val, b_val = next(a), next(b)
-    while True:
-        if a_val == b_val:
-            "*** YOUR CODE HERE ***"
-        elif a_val < b_val:
-            "*** YOUR CODE HERE ***"
+    def bank(message, amount):
+        "*** YOUR CODE HERE ***"
+        nonlocal balance
+        if message == "deposit":
+            balance += amount
+            return balance
+        elif message == "withdraw":
+            if amount > balance:
+                return "Insufficient funds"
+            else:
+                balance -= amount
+                return balance
         else:
-            "*** YOUR CODE HERE ***"
+            return 'Invalid message'
+    return bank
 
 
-def stair_ways(n):
-    """
-    Yield all the ways to climb a set of n stairs taking
-    1 or 2 steps at a time.
+def make_withdraw(balance, password):
+    """Return a password-protected withdraw function.
 
-    >>> list(stair_ways(0))
-    [[]]
-    >>> s_w = stair_ways(4)
-    >>> sorted([next(s_w) for _ in range(5)])
-    [[1, 1, 1, 1], [1, 1, 2], [1, 2, 1], [2, 1, 1], [2, 2]]
-    >>> list(s_w) # Ensure you're not yielding extra
-    []
+    >>> w = make_withdraw(100, 'hax0r')
+    >>> w(25, 'hax0r')
+    75
+    >>> error = w(90, 'hax0r')
+    >>> error
+    'Insufficient funds'
+    >>> error = w(25, 'hwat')
+    >>> error
+    'Incorrect password'
+    >>> new_bal = w(25, 'hax0r')
+    >>> new_bal
+    50
+    >>> w(75, 'a')
+    'Incorrect password'
+    >>> w(10, 'hax0r')
+    40
+    >>> w(20, 'n00b')
+    'Incorrect password'
+    >>> w(10, 'hax0r')
+    "Too many incorrect attempts. Attempts: ['hwat', 'a', 'n00b']"
+    >>> w(10, 'l33t')
+    "Too many incorrect attempts. Attempts: ['hwat', 'a', 'n00b']"
+    >>> type(w(10, 'l33t')) == str
+    True
     """
     "*** YOUR CODE HERE ***"
-
-
-def yield_paths(t, value):
-    """
-    Yields all possible paths from the root of t to a node with the label
-    value as a list.
-
-    >>> t1 = tree(1, [tree(2, [tree(3), tree(4, [tree(6)]), tree(5)]), tree(5)])
-    >>> print_tree(t1)
-    1
-      2
-        3
-        4
-          6
-        5
-      5
-    >>> next(yield_paths(t1, 6))
-    [1, 2, 4, 6]
-    >>> path_to_5 = yield_paths(t1, 5)
-    >>> sorted(list(path_to_5))
-    [[1, 2, 5], [1, 5]]
-
-    >>> t2 = tree(0, [tree(2, [t1])])
-    >>> print_tree(t2)
-    0
-      2
-        1
-          2
-            3
-            4
-              6
-            5
-          5
-    >>> path_to_2 = yield_paths(t2, 2)
-    >>> sorted(list(path_to_2))
-    [[0, 2], [0, 2, 1, 2]]
-    """
-    if label(t) == value:
-        yield ____
-    for b in branches(t):
-        for ____ in ____:
-            yield ____
+    invalid_trials = []
+    locked = False
+    def withdraw(amount, pw):
+        nonlocal balance, password, locked
+        if locked:
+            return f"Too many incorrect attempts. Attempts: {invalid_trials}"
+        if pw == password:
+            if amount > balance:
+                return "Insufficient funds"
+            else:
+                balance -= amount
+                return balance
+        else:
+            invalid_trials.append(pw)
+            if len(invalid_trials) == 3:
+                locked = True
+            return "Incorrect password"
+    return withdraw
 
 
 
-# Tree Data Abstraction
 
-def tree(label, branches=[]):
-    """Construct a tree with the given label value and a list of branches."""
-    for branch in branches:
-        assert is_tree(branch), 'branches must be trees'
-    return [label] + list(branches)
+def repeated(t, k):
+    """Return the first value in iterator T that appears K times in a row. Iterate through the items such that
+    if the same iterator is passed into repeated twice, it continues in the second call at the point it left off
+    in the first.
 
-def label(tree):
-    """Return the label value of a tree."""
-    return tree[0]
-
-def branches(tree):
-    """Return the list of branches of the given tree."""
-    return tree[1:]
-
-def is_tree(tree):
-    """Returns True if the given tree is a tree, and False otherwise."""
-    if type(tree) != list or len(tree) < 1:
-        return False
-    for branch in branches(tree):
-        if not is_tree(branch):
-            return False
-    return True
-
-def is_leaf(tree):
-    """Returns True if the given tree's list of branches is empty, and False
-    otherwise.
-    """
-    return not branches(tree)
-
-def print_tree(t, indent=0):
-    """Print a representation of this tree in which each node is
-    indented by two spaces times its depth from the root.
-
-    >>> print_tree(tree(1))
-    1
-    >>> print_tree(tree(1, [tree(2)]))
-    1
-      2
-    >>> numbers = tree(1, [tree(2), tree(3, [tree(4), tree(5)]), tree(6, [tree(7)])])
-    >>> print_tree(numbers)
-    1
-      2
-      3
-        4
-        5
-      6
-        7
-    """
-    print('  ' * indent + str(label(t)))
-    for b in branches(t):
-        print_tree(b, indent + 1)
-
-def copy_tree(t):
-    """Returns a copy of t. Only for testing purposes.
-
-    >>> t = tree(5)
-    >>> copy = copy_tree(t)
-    >>> t = tree(6)
-    >>> print_tree(copy)
+    >>> lst = iter([10, 9, 10, 9, 9, 10, 8, 8, 8, 7])
+    >>> repeated(lst, 2)
+    9
+    >>> lst2 = iter([10, 9, 10, 9, 9, 10, 8, 8, 8, 7])
+    >>> repeated(lst2, 3)
+    8
+    >>> s = iter([3, 2, 2, 2, 1, 2, 1, 4, 4, 5, 5, 5])
+    >>> repeated(s, 3)
+    2
+    >>> repeated(s, 3)
     5
+    >>> s2 = iter([4, 1, 6, 6, 7, 7, 8, 8, 2, 2, 2, 5])
+    >>> repeated(s2, 3)
+    2
     """
-    return tree(label(t), [copy_tree(b) for b in branches(t)])
+    assert k > 1
+    "*** YOUR CODE HERE ***"
+    last = next(t)
+    occur_times = 1
+    for v in t:
+        if v == last:
+            occur_times += 1
+            if occur_times == k:
+                return v
+        else:
+            occur_times = 1
+            last = v
+
+def merge(incr_a, incr_b):
+    """Yield the elements of strictly increasing iterables incr_a and incr_b, removing
+    repeats. Assume that incr_a and incr_b have no repeats. incr_a or incr_b may be infinite
+    sequences.
+
+    >>> m = merge([0, 2, 4, 6, 8, 10, 12, 14], [0, 3, 6, 9, 12, 15])
+    >>> type(m)
+    <class 'generator'>
+    >>> list(m)
+    [0, 2, 3, 4, 6, 8, 9, 10, 12, 14, 15]
+    >>> def big(n):
+    ...    k = 0
+    ...    while True: yield k; k += n
+    >>> m = merge(big(2), big(3))
+    >>> [next(m) for _ in range(11)]
+    [0, 2, 3, 4, 6, 8, 9, 10, 12, 14, 15]
+    """
+    iter_a, iter_b = iter(incr_a), iter(incr_b)
+    next_a, next_b = next(iter_a, None), next(iter_b, None)
+    "*** YOUR CODE HERE ***"
+    while next_a is not None or next_b is not None:
+        if next_a is None:
+            yield next_b
+            next_b = next(iter_b, None)
+        elif next_b is None:
+            yield next_a
+            next_a = next(iter_a, None)
+        else:
+            if next_a < next_b:
+                yield next_a
+                next_a = next(iter_a, None)
+            elif next_b < next_a:
+                yield next_b
+                next_b = next(iter_b, None)
+            else:
+                yield next_a
+                next_a, next_b = next(iter_a, None), next(iter_b, None)
+
+
+
+def make_joint(withdraw, old_pass, new_pass):
+    """Return a password-protected withdraw function that has joint access to
+    the balance of withdraw.
+
+    >>> w = make_withdraw(100, 'hax0r')
+    >>> w(25, 'hax0r')
+    75
+    >>> make_joint(w, 'my', 'secret')
+    'Incorrect password'
+    >>> j = make_joint(w, 'hax0r', 'secret')
+    >>> w(25, 'secret')
+    'Incorrect password'
+    >>> j(25, 'secret')
+    50
+    >>> j(25, 'hax0r')
+    25
+    >>> j(100, 'secret')
+    'Insufficient funds'
+
+    >>> j2 = make_joint(j, 'secret', 'code')
+    >>> j2(5, 'code')
+    20
+    >>> j2(5, 'secret')
+    15
+    >>> j2(5, 'hax0r')
+    10
+
+    >>> j2(25, 'password')
+    'Incorrect password'
+    >>> j2(5, 'secret')
+    "Too many incorrect attempts. Attempts: ['my', 'secret', 'password']"
+    >>> j(5, 'secret')
+    "Too many incorrect attempts. Attempts: ['my', 'secret', 'password']"
+    >>> w(5, 'hax0r')
+    "Too many incorrect attempts. Attempts: ['my', 'secret', 'password']"
+    >>> make_joint(w, 'hax0r', 'hello')
+    "Too many incorrect attempts. Attempts: ['my', 'secret', 'password']"
+    """
+    "*** YOUR CODE HERE ***"
+    check = withdraw(0, old_pass)
+    if type(check) == str:
+        return check
+    def joint_withdraw(amount, password):
+        nonlocal old_pass, new_pass
+        return withdraw(amount, old_pass if password == new_pass else password)
+    return joint_withdraw
+
+
+
+
+def remainders_generator(m):
+    """
+    Yields m generators. The ith yielded generator yields natural numbers whose
+    remainder is i when divided by m.
+
+    >>> import types
+    >>> [isinstance(gen, types.GeneratorType) for gen in remainders_generator(5)]
+    [True, True, True, True, True]
+    >>> remainders_four = remainders_generator(4)
+    >>> for i in range(4):
+    ...     print("First 3 natural numbers with remainder {0} when divided by 4:".format(i))
+    ...     gen = next(remainders_four)
+    ...     for _ in range(3):
+    ...         print(next(gen))
+    First 3 natural numbers with remainder 0 when divided by 4:
+    4
+    8
+    12
+    First 3 natural numbers with remainder 1 when divided by 4:
+    1
+    5
+    9
+    First 3 natural numbers with remainder 2 when divided by 4:
+    2
+    6
+    10
+    First 3 natural numbers with remainder 3 when divided by 4:
+    3
+    7
+    11
+    """
+    "*** YOUR CODE HERE ***"
+    def remainder(n):
+        while True:
+            for natural in naturals():
+                yield natural*m + n
+    yield remainder(0)
+    for i in range(-m+1,0):
+        yield remainder(i)
+
+def naturals():
+    """A generator function that yields the infinite sequence of natural
+    numbers, starting at 1.
+
+    >>> m = naturals()
+    >>> type(m)
+    <class 'generator'>
+    >>> [next(m) for _ in range(10)]
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    """
+    i = 1
+    while True:
+        yield i
+        i += 1
 

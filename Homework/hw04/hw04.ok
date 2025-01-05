@@ -1,6 +1,6 @@
 {
     "name": "Homework 4",
-    "endpoint": "cal/cs61a/fa24/hw04",
+    "endpoint": "cal/cs61a/su20/hw04",
     "src": [
         "hw04.py"
     ],
@@ -9,20 +9,19 @@
         "tests/*.py": "ok_test"
     },
     "default_tests": [
-        "shuffle",
-        "deep_map",
-        "total_mass",
+        "total_weight",
         "balanced",
-        "berry_finder",
-        "max_path_sum"
+        "totals_tree",
+        "replace_leaf",
+        "preorder",
+        "has_path"
     ],
     "protocols": [
         "restore",
         "file_contents",
-        "analytics",
-        "help",
         "unlock",
         "grading",
+        "analytics",
         "backup"
     ]
 }

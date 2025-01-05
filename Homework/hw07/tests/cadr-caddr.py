@@ -3,10 +3,6 @@ test = {
   'points': 1,
   'suites': [
     {
-      'type': 'scheme',
-      'setup': r"""
-      scm> (load-all ".")
-      """,
       'cases': [
         {
           'code': r"""
@@ -31,8 +27,14 @@ test = {
           """,
           'hidden': False,
           'locked': False
-        },
+        }
       ],
-    },
+      'scored': True,
+      'setup': r"""
+      scm> (load-all ".")
+      """,
+      'teardown': '',
+      'type': 'scheme'
+    }
   ]
 }

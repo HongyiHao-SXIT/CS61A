@@ -1,10 +1,12 @@
-passphrase = 'REPLACE_THIS_WITH_PASSPHRASE'
 
-def midsem_survey(p):
+passphrase = '*** PASSPHRASE HERE ***'
+
+
+def survey(p):
     """
     You do not need to understand this code.
-    >>> midsem_survey(passphrase)
-    '2bf925d47c03503d3ebe5a6fc12d479b8d12f14c0494b43deba963a0'
+    >>> survey(passphrase)
+    'bb4279ef9763aeadeeeb401258aef409493f08a6e7457ecc2bbeb5db'
     """
     import hashlib
     return hashlib.sha224(p.encode('utf-8')).hexdigest()
@@ -15,17 +17,17 @@ class VendingMachine:
 
     >>> v = VendingMachine('candy', 10)
     >>> v.vend()
-    'Nothing left to vend. Please restock.'
+    'Inventory empty. Restocking required.'
     >>> v.add_funds(15)
-    'Nothing left to vend. Please restock. Here is your $15.'
+    'Inventory empty. Restocking required. Here is your $15.'
     >>> v.restock(2)
     'Current candy stock: 2'
     >>> v.vend()
-    'Please add $10 more funds.'
+    'You must add $10 more funds.'
     >>> v.add_funds(7)
     'Current balance: $7'
     >>> v.vend()
-    'Please add $3 more funds.'
+    'You must add $3 more funds.'
     >>> v.add_funds(5)
     'Current balance: $12'
     >>> v.vend()
@@ -35,7 +37,7 @@ class VendingMachine:
     >>> v.vend()
     'Here is your candy.'
     >>> v.add_funds(15)
-    'Nothing left to vend. Please restock. Here is your $15.'
+    'Inventory empty. Restocking required. Here is your $15.'
 
     >>> w = VendingMachine('soda', 2)
     >>> w.restock(3)
@@ -47,42 +49,160 @@ class VendingMachine:
     >>> w.vend()
     'Here is your soda.'
     """
-    def __init__(self, product, price):
-        """Set the product and its price, as well as other instance attributes."""
-        "*** YOUR CODE HERE ***"
-
-    def restock(self, n):
-        """Add n to the stock and return a message about the updated stock level.
-
-        E.g., Current candy stock: 3
-        """
-        "*** YOUR CODE HERE ***"
-
-    def add_funds(self, n):
-        """If the machine is out of stock, return a message informing the user to restock
-        (and return their n dollars).
-
-        E.g., Nothing left to vend. Please restock. Here is your $4.
-
-        Otherwise, add n to the balance and return a message about the updated balance.
-
-        E.g., Current balance: $4
-        """
-        "*** YOUR CODE HERE ***"
+    "*** YOUR CODE HERE ***"
+    def __init__(self, kind, price):
+        self.kind = kind
+        self.price = price
+        self.balance = 0
+        self.stock = 0
 
     def vend(self):
-        """Dispense the product if there is sufficient stock and funds and
-        return a message. Update the stock and balance accordingly.
+        if self.stock == 0:
+            return "Inventory empty. Restocking required."
+        x = abs(self.price  - self.balance)
+        if self.price > self.balance:
+            return f"You must add ${x} more funds."
+        elif self.price == self.balance:
+            self.stock -= 1
+            self.balance = 0
+            return f"Here is your {self.kind}."
+        else:
+            self.stock -= 1
+            self.balance = 0
+            return f"Here is your {self.kind} and ${x} change."
 
-        E.g., Here is your candy and $2 change.
+    def add_funds(self, money):
+        if self.stock == 0:
+            return f"Inventory empty. Restocking required. Here is your ${money}."
+        else:
+            self.balance += money
+            return f"Current balance: ${self.balance}"
 
-        If not, return a message suggesting how to correct the problem.
+    def restock(self, num):
+        self.stock += num
+        return f"Current {self.kind} stock: {self.stock}"
 
-        E.g., Nothing left to vend. Please restock.
-              Please add $3 more funds.
-        """
+
+
+class Mint:
+    """A mint creates coins by stamping on years.
+
+    The update method sets the mint's stamp to Mint.current_year.
+
+    >>> mint = Mint()
+    >>> mint.year
+    2020
+    >>> dime = mint.create(Dime)
+    >>> dime.year
+    2020
+    >>> Mint.current_year = 2100  # Time passes
+    >>> nickel = mint.create(Nickel)
+    >>> nickel.year     # The mint has not updated its stamp yet
+    2020
+    >>> nickel.worth()  # 5 cents + (80 - 50 years)
+    35
+    >>> mint.update()   # The mint's year is updated to 2100
+    >>> Mint.current_year = 2175     # More time passes
+    >>> mint.create(Dime).worth()    # 10 cents + (75 - 50 years)
+    35
+    >>> Mint().create(Dime).worth()  # A new mint has the current year
+    10
+    >>> dime.worth()     # 10 cents + (155 - 50 years)
+    115
+    >>> Dime.cents = 20  # Upgrade all dimes!
+    >>> dime.worth()     # 20 cents + (155 - 50 years)
+    125
+    """
+    current_year = 2020
+
+    def __init__(self):
+        self.update()
+
+    def create(self, kind):
         "*** YOUR CODE HERE ***"
+        return kind(self.year)
 
+    def update(self):
+        "*** YOUR CODE HERE ***"
+        self.year = Mint.current_year
+
+class Coin:
+    def __init__(self, year):
+        self.year = year
+
+    def worth(self):
+        "*** YOUR CODE HERE ***"
+        time = Mint.current_year - self.year
+
+        return self.cents + (0 if time < 50 else time - 50) 
+
+class Nickel(Coin):
+    cents = 5
+
+class Dime(Coin):
+    cents = 10
+
+
+def is_bst(t):
+    """Returns True if the Tree t has the structure of a valid BST.
+
+    >>> t1 = Tree(6, [Tree(2, [Tree(1), Tree(4)]), Tree(7, [Tree(7), Tree(8)])])
+    >>> is_bst(t1)
+    True
+    >>> t2 = Tree(8, [Tree(2, [Tree(9), Tree(1)]), Tree(3, [Tree(6)]), Tree(5)])
+    >>> is_bst(t2)
+    False
+    >>> t3 = Tree(6, [Tree(2, [Tree(4), Tree(1)]), Tree(7, [Tree(7), Tree(8)])])
+    >>> is_bst(t3)
+    False
+    >>> t4 = Tree(1, [Tree(2, [Tree(3, [Tree(4)])])])
+    >>> is_bst(t4)
+    True
+    >>> t5 = Tree(1, [Tree(0, [Tree(-1, [Tree(-2)])])])
+    >>> is_bst(t5)
+    True
+    >>> t6 = Tree(1, [Tree(4, [Tree(2, [Tree(3)])])])
+    >>> is_bst(t6)
+    True
+    >>> t7 = Tree(2, [Tree(1, [Tree(5)]), Tree(4)])
+    >>> is_bst(t7)
+    False
+    """
+    "*** YOUR CODE HERE ***"
+    def bst_min(t):
+        if t.is_leaf():
+            return t.label
+        elif len(t.branches) == 1:
+            if t.label > t.branches[0].label:
+                return bst_min(t.branches[0])
+            else:
+                return t.label
+        else:
+            return bst_min(t.branches[0])
+
+    def bst_max(t):
+        if t.is_leaf():
+            return t.label
+        elif len(t.branches) == 1:
+            if t.label < t.branches[0].label:
+                return bst_max(t.branches[0])
+            else:
+                return t.label
+        else:
+            return bst_max(t.branches[1])
+
+    if t.is_leaf():
+        return True
+    if len(t.branches) == 1:
+        if t.label > t.branches[0].label:
+            return is_bst(t.branches[0]) and t.label >= bst_max(t.branches[0])
+        else:
+            return is_bst(t.branches[0]) and t.label < bst_min(t.branches[0])
+    elif len(t.branches) == 2:
+        le, ri = t.branches
+        return is_bst(le) and is_bst(ri) and (bst_max(le) <= t.label < bst_min(ri))
+    else:
+        return False
 
 def store_digits(n):
     """Stores the digits of a positive number n in a linked list.
@@ -94,59 +214,192 @@ def store_digits(n):
     Link(2, Link(3, Link(4, Link(5))))
     >>> store_digits(876)
     Link(8, Link(7, Link(6)))
-    >>> store_digits(2450)
-    Link(2, Link(4, Link(5, Link(0))))
-    >>> store_digits(20105)
-    Link(2, Link(0, Link(1, Link(0, Link(5)))))
     >>> # a check for restricted functions
     >>> import inspect, re
     >>> cleaned = re.sub(r"#.*\\n", '', re.sub(r'"{3}[\s\S]*?"{3}', '', inspect.getsource(store_digits)))
     >>> print("Do not use str or reversed!") if any([r in cleaned for r in ["str", "reversed"]]) else None
     """
     "*** YOUR CODE HERE ***"
+    def helper(lst, n):
+        if n == 0:
+            return lst
+        lst = Link(n % 10, lst) 
+        return helper(lst, n//10)
+    ans = Link(n%10, Link.empty)
+    return helper(ans, n//10)
 
 
-def deep_map_mut(func, s):
-    """Mutates a deep link s by replacing each item found with the
-    result of calling func on the item. Does NOT create new Links (so
-    no use of Link's constructor).
 
-    Does not return the modified Link object.
+def path_yielder(t, value):
+    """Yields all possible paths from the root of t to a node with the label value
+    as a list.
 
-    >>> link1 = Link(3, Link(Link(4), Link(5, Link(6))))
-    >>> print(link1)
-    <3 <4> 5 6>
-    >>> # Disallow the use of making new Links before calling deep_map_mut
-    >>> Link.__init__, hold = lambda *args: print("Do not create any new Links."), Link.__init__
-    >>> try:
-    ...     deep_map_mut(lambda x: x * x, link1)
-    ... finally:
-    ...     Link.__init__ = hold
-    >>> print(link1)
-    <9 <16> 25 36>
+    >>> t1 = Tree(1, [Tree(2, [Tree(3), Tree(4, [Tree(6)]), Tree(5)]), Tree(5)])
+    >>> print(t1)
+    1
+      2
+        3
+        4
+          6
+        5
+      5
+    >>> next(path_yielder(t1, 6))
+    [1, 2, 4, 6]
+    >>> path_to_5 = path_yielder(t1, 5)
+    >>> sorted(list(path_to_5))
+    [[1, 2, 5], [1, 5]]
+
+    >>> t2 = Tree(0, [Tree(2, [t1])])
+    >>> print(t2)
+    0
+      2
+        1
+          2
+            3
+            4
+              6
+            5
+          5
+    >>> path_to_2 = path_yielder(t2, 2)
+    >>> sorted(list(path_to_2))
+    [[0, 2], [0, 2, 1, 2]]
     """
+
     "*** YOUR CODE HERE ***"
 
+    if t.label == value:
+        yield [value]
+    for b in t.branches:
+        for path in path_yielder(b, value):
+            yield [t.label] + path
 
-def two_list(vals, counts):
-    """
-    Returns a linked list according to the two lists that were passed in. Assume
-    vals and counts are the same size. Elements in vals represent the value, and the
-    corresponding element in counts represents the number of this value desired in the
-    final linked list. Assume all elements in counts are greater than 0. Assume both
-    lists have at least one element.
-    >>> a = [1, 3]
-    >>> b = [1, 1]
-    >>> c = two_list(a, b)
-    >>> c
-    Link(1, Link(3))
-    >>> a = [1, 3, 2]
-    >>> b = [2, 2, 1]
-    >>> c = two_list(a, b)
-    >>> c
-    Link(1, Link(1, Link(3, Link(3, Link(2)))))
+            "*** YOUR CODE HERE ***"
+
+
+def remove_all(link , value):
+    """Remove all the nodes containing value in link. Assume that the
+    first element is never removed.
+
+    >>> l1 = Link(0, Link(2, Link(2, Link(3, Link(1, Link(2, Link(3)))))))
+    >>> print(l1)
+    <0 2 2 3 1 2 3>
+    >>> remove_all(l1, 2)
+    >>> print(l1)
+    <0 3 1 3>
+    >>> remove_all(l1, 3)
+    >>> print(l1)
+    <0 1>
+    >>> remove_all(l1, 3)
+    >>> print(l1)
+    <0 1>
     """
     "*** YOUR CODE HERE ***"
+    if link.rest == Link.empty:
+        return
+    if link.rest.first == value:
+        link.rest = link.rest.rest
+        remove_all(link, value)
+    else:
+        remove_all(link.rest, value)
+
+
+
+def deep_map(f, link):
+    """Return a Link with the same structure as link but with fn mapped over
+    its elements. If an element is an instance of a linked list, recursively
+    apply f inside that linked list as well.
+
+    >>> s = Link(1, Link(Link(2, Link(3)), Link(4)))
+    >>> print(deep_map(lambda x: x * x, s))
+    <1 <4 9> 16>
+    >>> print(s) # unchanged
+    <1 <2 3> 4>
+    >>> print(deep_map(lambda x: 2 * x, Link(s, Link(Link(Link(5))))))
+    <<2 <4 6> 8> <<10>>>
+    """
+    "*** YOUR CODE HERE ***"
+    if link == Link.empty:
+        return Link.empty
+    if isinstance(link.first, Link):
+        first = deep_map(f, link.first)
+    else:
+        first = f(link.first)
+    return Link(first, deep_map(f, link.rest))
+
+
+class Tree:
+    """
+    >>> t = Tree(3, [Tree(2, [Tree(5)]), Tree(4)])
+    >>> t.label
+    3
+    >>> t.branches[0].label
+    2
+    >>> t.branches[1].is_leaf()
+    True
+    """
+    def __init__(self, label, branches=[]):
+        for b in branches:
+            assert isinstance(b, Tree)
+        self.label = label
+        self.branches = list(branches)
+
+    def is_leaf(self):
+        return not self.branches
+
+    def map(self, fn):
+        """
+        Apply a function `fn` to each node in the tree and mutate the tree.
+
+        >>> t1 = Tree(1)
+        >>> t1.map(lambda x: x + 2)
+        >>> t1.map(lambda x : x * 4)
+        >>> t1.label
+        12
+        >>> t2 = Tree(3, [Tree(2, [Tree(5)]), Tree(4)])
+        >>> t2.map(lambda x: x * x)
+        >>> t2
+        Tree(9, [Tree(4, [Tree(25)]), Tree(16)])
+        """
+        self.label = fn(self.label)
+        for b in self.branches:
+            b.map(fn)
+
+    def __contains__(self, e):
+        """
+        Determine whether an element exists in the tree.
+
+        >>> t1 = Tree(1)
+        >>> 1 in t1
+        True
+        >>> 8 in t1
+        False
+        >>> t2 = Tree(3, [Tree(2, [Tree(5)]), Tree(4)])
+        >>> 6 in t2
+        False
+        >>> 5 in t2
+        True
+        """
+        if self.label == e:
+            return True
+        for b in self.branches:
+            if e in b:
+                return True
+        return False
+
+    def __repr__(self):
+        if self.branches:
+            branch_str = ', ' + repr(self.branches)
+        else:
+            branch_str = ''
+        return 'Tree({0}{1})'.format(self.label, branch_str)
+
+    def __str__(self):
+        def print_tree(t, indent=0):
+            tree_str = '  ' * indent + str(t.label) + "\n"
+            for b in t.branches:
+                tree_str += print_tree(b, indent + 1)
+            return tree_str
+        return print_tree(self).rstrip()
 
 
 class Link:
