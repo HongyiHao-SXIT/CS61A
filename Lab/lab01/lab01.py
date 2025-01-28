@@ -1,5 +1,5 @@
 def digit(n, k):
-    """Return the digit that is k from the right of n for positive integers n and k.
+    """Return the k-th digit from the right of n for positive integers n and k.
 
     >>> digit(3579, 2)
     5
@@ -8,7 +8,7 @@ def digit(n, k):
     >>> digit(3579, 10)
     0
     """
-    return n % k
+    return 
 
 
 def middle(a, b, c):
@@ -26,7 +26,7 @@ def middle(a, b, c):
     >>> middle(30, 5, 40)
     30
     """
-    return middle(a,b,c)
+    return ____
 
 
 def falling(n, k):
@@ -42,10 +42,12 @@ def falling(n, k):
     1
     """
     "*** YOUR CODE HERE ***"
-    while(k > 0):
-        n = n*(n-1)
-        k = k -1 
-
+    result = 1
+    while k > 0:
+        result *= n
+        n = n - 1
+        k = k - 1
+    return result
 
 def divisible_by_k(n, k):
     """
@@ -63,7 +65,7 @@ def divisible_by_k(n, k):
     3
     >>> b
     3
-    >>> c = divisible_by_k(6, 7)  # There are no integers up to 6 divisible by 7
+    >>> c = divisible_by_k(6, 7)  # There are no integers up to 6 that are divisible by 7
     >>> c
     0
     """
